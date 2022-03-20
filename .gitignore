@@ -4,6 +4,10 @@ geckodriver.log
 test.py
 test2.py
 .DS_Store
+naver_test.py
+output1.html
+product_page.html
+1688_item.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

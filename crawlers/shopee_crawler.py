@@ -138,5 +138,5 @@ def main(keyword):
 if __name__ == '__main__':
     # keyword = input('검색할 상품 키워드를 입력하세요...')
     keyword = 'rice cooker'
-    main(keyword)
+    print(main(keyword))
 
