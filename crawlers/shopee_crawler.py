@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.common.keys import Keys
 import os
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from bs4 import BeautifulSoup
@@ -50,14 +49,33 @@ def get_item_info(driver):
     return item_info_df
 
 def main(keyword):
+
+    start_time = time.time()
+
     options = FirefoxOptions()
     options.add_argument("--headless")
 
-    binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference("network.http.pipelining", True)
+    profile.set_preference("network.http.proxy.pipelining", True)
+    profile.set_preference("network.http.pipelining.maxrequests", 8)
+    profile.set_preference("content.notify.interval", 500000)
+    profile.set_preference("content.notify.ontimer", True)
+    profile.set_preference("content.switch.threshold", 250000)
+    profile.set_preference("browser.cache.memory.capacity", 65536) # Increase the cache capacity.
+    profile.set_preference("browser.startup.homepage", "about:blank")
+    profile.set_preference("reader.parse-on-load.enabled", False) # Disable reader, we won't need that.
+    profile.set_preference("loop.enabled", False)
+    profile.set_preference("browser.chrome.toolbar_style", 1) # Text on Toolbar instead of icons
+    profile.set_preference("browser.display.show_image_placeholders", False) # Don't show thumbnails on not loaded images.
+    profile.set_preference("browser.display.use_document_fonts", 0) # Don't load document fonts.
+    profile.set_preference("permissions.default.image", 2) # Image load disabled again
 
+    binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
 
     driver = webdriver.Firefox(
         firefox_binary=binary,
+        firefox_profile=profile,
         executable_path=os.environ.get('GECKODRIVER_PATH'),
         options=options)
 
@@ -81,7 +99,7 @@ def main(keyword):
                 driver.find_element_by_xpath('/html/body/div[2]/div[1]/div[1]/div/div[3]/div[1]/button').click()
             except:
                 break
-        y += 500
+        y += 800
         last_height = new_height
 
     info = get_item_info(driver)
@@ -91,6 +109,8 @@ def main(keyword):
     info.rename({'title':'상품명',
     'price':'가격(RM)',
     'solds':'판매량(월 평균)'},axis=1,inplace=True)
+    end_time = time.time()
+    print('쇼피 데이터 수집 걸린 시간 : ', end_time-start_time)
     return info
 
 
