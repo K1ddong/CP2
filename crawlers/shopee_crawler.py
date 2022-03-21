@@ -1,5 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.common.keys import Keys
+import os
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
@@ -49,7 +52,14 @@ def get_item_info(driver):
 def main(keyword):
     options = FirefoxOptions()
     options.add_argument("--headless")
-    driver = webdriver.Firefox(options=options)
+
+    binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
+
+
+    driver = webdriver.Firefox(
+        firefox_binary=binary,
+        executable_path=os.environ.get('GECKODRIVER_PATH'),
+        options=options)
 
     url = get_url(keyword)
     driver.get(url)
