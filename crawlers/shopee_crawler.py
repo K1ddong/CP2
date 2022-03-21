@@ -83,60 +83,9 @@ def main(keyword):
     'solds':'판매량(월 평균)'},axis=1,inplace=True)
     return info
 
-# def get_item_info(driver):
-#         rows = []
-#         html = driver.page_source
-#         soup = BeautifulSoup(html, "html.parser")
-#         for i,item in enumerate(soup.find_all('div', {'class': 'col-xs-2-4 shopee-search-item-result__item'})):
-#             #상품명
-#             # name = item.find('div', {'class': '_10Wbs- _2STCsK _3IqNCf'})
-#             # if name is not None:
-#             #     name = name.text.strip()
-#             # else:
-#             #     name = ''
-#             #상품 가격(최저)
-#             price = item.find('div', {'class': 'zp9xm9 kNGSLn l-u0xK'})
-#             if price is not None:
-#                 price = price.find('span', {'class': '_3c5u7X'}).text.strip()
-#             else:
-#                 price = ''
-
-#             #판매량(월)
-#             sold = item.find('div', {'class':'_1uq9fs'})
-#             if sold is not None:
-#                 sold = sold.text.strip()
-#             else:
-#                 sold = ''
-
-#             #원가(세일 전)
-#             original_price = item.find('div', {'class':'zp9xm9 U-y_Gd _3rcqcF'})
-#             if original_price is not None:
-#                 original_price = original_price.text.strip()
-#             else:
-#                 original_price = ''
-
-#             #할인율
-#             dc_rate = item.find('span', {'class': 'percent'})
-#             if dc_rate is not None:
-#                 dc_rate = dc_rate.text.strip()
-#             else:
-#                 dc_rate = ''
-
-#             #상품 link
-#             # link = item.find('a')
-#             # if link is not None:
-#             #     link = link.get('href')
-#             # else:
-#             #     link = ''
-
-#             print([i, price, sold, original_price, dc_rate])
-#             rows.append([i, price, sold, original_price, dc_rate])
-#         return rows
-
-
 
 if __name__ == '__main__':
     # keyword = input('검색할 상품 키워드를 입력하세요...')
     keyword = 'rice cooker'
-    print(main(keyword))
+    main(keyword)
 

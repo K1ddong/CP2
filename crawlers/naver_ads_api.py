@@ -34,7 +34,6 @@ def main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID):
                     headers=get_header(method, uri, API_KEY, SECRET_KEY, CUSTOMER_ID))
 
     #전체 키워드 관련 자료
-    print(r.json())
     keyword_data = list(filter(lambda x:keyword in x['relKeyword'], r.json()['keywordList']))
     #필요한 것
     ##키워드 검색량

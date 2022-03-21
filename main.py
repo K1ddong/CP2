@@ -1,17 +1,35 @@
 from crypt import methods
-from crawlers import shopee_crawler, naver_trends,naver_shopping_crawler,naver_ads_api,google_trends
 from config_for_main import get_secret
+from crawlers import shopee_crawler, naver_trends,naver_shopping_crawler,naver_ads_api,google_trends
 
 import googletrans
+import os
 
 # #네이버 데이터랩 api
-NAVER_API_ID = get_secret("NAVER_API_ID")
-NAVER_API_SECRET = get_secret("NAVER_API_SECRET")
+try:
+    NAVER_API_ID = get_secret("NAVER_API_ID")
+except:
+    NAVER_API_ID = os.getenv("NAVER_API_ID")
+
+try:
+    NAVER_API_SECRET = get_secret("NAVER_API_SECRET")
+except:
+    NAVER_API_SECRET = os.getenv("NAVER_API_SECRET")
 
 # #네이버 검색광고 api
-API_KEY = get_secret("API_KEY")
-SECRET_KEY = get_secret("SECRET_KEY")
-CUSTOMER_ID = get_secret("CUSTOMER_ID")
+try:
+    API_KEY = get_secret("API_KEY")
+except:
+    API_KEY = os.getenv("API_KEY")
+
+try:
+    SECRET_KEY = get_secret("SECRET_KEY")
+except:
+    SECRET_KEY = os.getenv("SECRET_KEY")
+try:
+    CUSTOMER_ID = get_secret("CUSTOMER_ID")  
+except:
+    CUSTOMER_ID = os.getenv("CUSTOMER_ID")
 
 '''
 ------------------------ 크롤링 --------------------------------
@@ -95,8 +113,6 @@ def home():
         keyword = request.form['keyword']
     #키워드 번역
     translator = googletrans.Translator()
-    # keyword = input('검색어를 입력해주세요.')
-    # keyword = '밥솥'
     keyword_en = str(translator.translate(keyword, src='ko', dest='en').text)
 
     #구글 검색 트렌드
