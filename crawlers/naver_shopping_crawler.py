@@ -35,14 +35,20 @@ def main(keyword):
     profile.set_preference("browser.display.use_document_fonts", 0) # Don't load document fonts.
     profile.set_preference("permissions.default.image", 2) # Image load disabled again
 
-    binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
-
-
-    driver = webdriver.Firefox(
-        firefox_binary=binary,
-        firefox_options=profile,
-        executable_path=os.environ.get('GECKODRIVER_PATH'),
-        options=options)
+    try:
+        binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
+    except:
+        pass
+    try:
+        driver = webdriver.Firefox(
+            firefox_binary=binary,
+            firefox_profile=profile,
+            executable_path=os.environ.get('GECKODRIVER_PATH'),
+            options=options)
+    except:
+        driver = webdriver.Firefox(
+            firefox_profile=profile,
+            options=options)
 
     url = get_url(keyword)
     driver.get(url)

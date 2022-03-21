@@ -132,7 +132,7 @@ def home():
     google_trend[keyword_en] = df/df.max() * 100 
 
     #쇼피 키워드 상품 정보
-    shopee_item_info = shopee_crawler.main(keyword_en)
+    # shopee_item_info = shopee_crawler.main(keyword_en)
 
     #네이버 키워드 상품 검색량, 연관 키워드 검색량
     keyword_search_volume,top_10_related_keywords= naver_ads_api.main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID)
@@ -286,8 +286,8 @@ def home():
             children=f"쇼피 말레이시아 \'{keyword_en}\' 상품 상위 TOP50",
         ),
         dt.DataTable(
-            shopee_item_info.to_dict('records'),
-            [{"name":i, "id":i} for i in shopee_item_info.columns],
+            naver_item_info.to_dict('records'),
+            [{"name":i, "id":i} for i in naver_item_info.columns],
             style_data={
                 'whiteSpace': 'normal',
                 'height': 'auto',
