@@ -1,3 +1,4 @@
+from symtable import Symbol
 from click import style
 import pandas as pd
 
@@ -21,16 +22,47 @@ naver_trend
 # import dash, dash_html_components as html, dash_table
 import dash_bootstrap_components as dbc
 from dash import dcc, html, dash_table, Dash
-import plotly.graph_objs as go
+import plotly.graph_objects as go
 from dash.dependencies import Input, Output
-import plotly          #(version 4.4.1)
 import plotly.express as px
+from plotly.subplots import make_subplots
 
 
 keyword = '밥솥'
 
-app = Dash(external_stylesheets = [ dbc.themes.MINTY],)
+#-------------------------전처리-------------------------
 
+####---------함수------------###
+def brand_from_title(title):
+    brand = title.split(' ')[0]
+    return brand
+
+
+####---------네이버-----------###
+
+naver_item_info['브랜드'] = naver_item_info['상품명'].apply(brand_from_title)
+
+naver_avg_price = round(naver_item_info['가격(원)'].mean())
+card_naver_avg_price = [
+    dbc.CardHeader("네이버 top31 평균 가격"),
+    dbc.CardBody([html.H3(f"{naver_avg_price}")])  
+    ]
+
+naver_min_price = round(naver_item_info['가격(원)'].min())
+card_naver_min_price = [
+    dbc.CardHeader("네이버 top31 최저 가격"),
+    dbc.CardBody([html.H3(f"{naver_min_price}")])  
+    ]
+
+naver_max_price = round(naver_item_info['가격(원)'].max())
+card_naver_max_price = [
+    dbc.CardHeader("네이버 top31 최고 가격"),
+    dbc.CardBody([html.H3(f"{naver_max_price}")])  
+    ]
+
+
+
+###-----------시각화 요소---------###
 card_keyword = [
     dbc.CardHeader("검색 키워드"),
     dbc.CardBody([html.H3(f"{keyword}")])  
@@ -142,8 +174,26 @@ table = dash_table.DataTable(
     }
 )
 
-graph_scatter_naver_item_price = px.scatter(naver_item_info, x='가격(원)', y='누적 리뷰수', symbol='상품명')
+naver_color = dict(zip(naver_item_info["브랜드"].unique(), px.colors.qualitative.G10))
 
+graph_scatter_naver_item_price = px.scatter(naver_item_info, 
+                                            x='가격(원)', 
+                                            y='누적 리뷰수', 
+                                            hover_name='상품명', 
+                                            color='브랜드',
+                                            color_discrete_map=naver_color, 
+                                            symbol='브랜드').update_traces(marker_size=10)
+
+
+graph_pie_naver_brand_dist = px.pie(naver_item_info['브랜드'].value_counts(),
+                                    values = naver_item_info['브랜드'].value_counts().values,
+                                    names = naver_item_info['브랜드'].value_counts().index,
+                                    color = naver_item_info['브랜드'].value_counts().index,
+                                    color_discrete_map=naver_color)
+
+
+#------------------------대시보드 레이아웃 ----------------------------------
+app = Dash(external_stylesheets = [ dbc.themes.MINTY],)
 
 app.layout = html.Div(id = 'parent_div', children = [
     html.Div(id = 'card', children = [
@@ -167,8 +217,28 @@ app.layout = html.Div(id = 'parent_div', children = [
             dbc.Col(dcc.Graph(figure = bar_figure_naver_top10_related))
             ]),
         ],style={'textAlign':'center',
-                'whiteSpace':'normal'}, fluid = True),
+                'whiteSpace':'normal',
+                'maxWidth':'100%',
+                'Display':'inline-block'}, fluid = True),
     ]),
+    html.Div(id = 'naver_item_price_card', children = [
+        dbc.Container([
+            dbc.Row([
+                dbc.Col(dbc.Card(card_naver_min_price, color = 'primary', outline = True)),
+                dbc.Col(dbc.Card(card_naver_avg_price, color = 'info', inverse = True)),
+                dbc.Col(dbc.Card(card_naver_max_price, color = 'info', inverse = True))
+                ]),
+            dbc.Row([
+                dbc.Col(dcc.Graph(figure=graph_scatter_naver_item_price)),
+                dbc.Col(dcc.Graph(figure=graph_pie_naver_brand_dist))
+                ])
+            ],
+                    style={'textAlign':'center',
+                           'whiteSpace':'normal'},
+                    fluid = False)
+        ]),
+    html.Div(id = 'naver_item_price_scatter', children=[dcc.Graph(figure=graph_scatter_naver_item_price)]),
+    html.Div(id = 'naver_brand_dist_pie', children=[dcc.Graph(figure=graph_pie_naver_brand_dist)]),
     html.Div(id = 'naver_item', children = [
         dbc.Container([
             dbc.Row([
@@ -180,9 +250,9 @@ app.layout = html.Div(id = 'parent_div', children = [
     html.Div(id = 'naver_keyword', children = [naver_keyword]),
     html.Br(),
     html.Div(id = 'shopee', children = [table]),
-    html.Div(id = 'naver_item_price', children=[dcc.Graph(figure=graph_scatter_naver_item_price)])
     ])
 
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+    print(naver_color)
