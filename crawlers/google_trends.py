@@ -1,6 +1,6 @@
 from distutils.log import info
 from pytrends.request import TrendReq
-
+import googletrans
 
 
 class GoogleTrend:
@@ -49,7 +49,9 @@ class GoogleTrend:
 
 
 if __name__ == '__main__':
-    keyword = ['rice cooker']
-    # main(keyword)
-    test = GoogleTrend(keyword)
+    keyword = '모니터'
+    translator = googletrans.Translator()
+    keyword_en = str(translator.translate(keyword, src='ko', dest='en').text)
+    test = GoogleTrend([keyword_en])
     print(test.rising())
+

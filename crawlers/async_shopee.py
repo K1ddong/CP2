@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 import re
-
+import asyncio
 
 #동적웹 컨트롤
 def page_control(driver):
@@ -88,11 +88,11 @@ def get_item_link(item_list, url):
     return item_link
 
 
-def get_item_details(item_link):
+async def get_item_details(item_link):
     options = FirefoxOptions()
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
-    driver.get(item_link)
+    await driver.get(item_link)
     time.sleep(1)
     driver.find_element(By.XPATH,'/html/body/div[2]/div[1]/div[1]/div/div[3]/div[1]/button').click()
     html = driver.page_source

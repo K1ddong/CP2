@@ -68,7 +68,7 @@ def main(keyword):
     end_time = time.time()
     print('네이버 데이터 수집 걸린 시간 :',end_time-start_time)
     return info
-
+    
 def get_item_info(driver):
     item_info = []
     html = driver.page_source
