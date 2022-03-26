@@ -48,23 +48,22 @@ def strip_keyword(title):
 ####---------네이버-----------###
 
 naver_item_info['브랜드'] = naver_item_info['상품명'].apply(brand_from_title)
-
 naver_avg_price = round(naver_item_info['가격(원)'].mean())
 card_naver_avg_price = [
     dbc.CardHeader("네이버 top31 평균 가격"),
-    dbc.CardBody([html.H3(f"{naver_avg_price}")])  
+    dbc.CardBody([html.H3(f"{naver_avg_price} 원")])  
     ]
 
 naver_min_price = round(naver_item_info['가격(원)'].min())
 card_naver_min_price = [
     dbc.CardHeader("네이버 top31 최저 가격"),
-    dbc.CardBody([html.H3(f"{naver_min_price}")])  
+    dbc.CardBody([html.H3(f"{naver_min_price} 원")])  
     ]
 
 naver_max_price = round(naver_item_info['가격(원)'].max())
 card_naver_max_price = [
     dbc.CardHeader("네이버 top31 최고 가격"),
-    dbc.CardBody([html.H3(f"{naver_max_price}")])  
+    dbc.CardBody([html.H3(f"{naver_max_price} 원")])  
     ]
 
 
@@ -74,112 +73,27 @@ card_keyword = [
     dbc.CardHeader("검색 키워드"),
     dbc.CardBody([html.H3(f"{keyword}")])  
     ]
-card_pc_search_volume = [
-    dbc.CardHeader("월간 검색량(PC) / 클릭률"),
-    dbc.CardBody([html.H3(f"{keyword_search_volume.iloc[0][1]} / {keyword_search_volume.iloc[0][5]}%")])  
+card_search_volume = [
+    dbc.CardHeader("월간 검색량 (PC / 모바일)"),
+    dbc.CardBody([html.H3(f"{keyword_search_volume.iloc[0][1]} / {keyword_search_volume.iloc[0][2]}")])  
     ]
-card_mobile_search_volume = [
-    dbc.CardHeader("월간 검색량(모바일) / 클릭률"),
-    dbc.CardBody([html.H3(f"{keyword_search_volume.iloc[0][2]} / {keyword_search_volume.iloc[0][6]}%")])  
+card_click_volume = [
+    dbc.CardHeader("클릭수 (PC / 모바일)"),
+    dbc.CardBody([html.H3(f"{int(keyword_search_volume.iloc[0][3])} ({keyword_search_volume.iloc[0][5]}%) / {int(keyword_search_volume.iloc[0][4])} ({keyword_search_volume.iloc[0][6]}%)")])  
     ]
-graph_figure_naver_search_trend= {
-                "data": [
-                    {
-                        "x": naver_trend["날짜"],
-                        "y": naver_trend[keyword],
-                        "type": "lines", "name":"naver"
-                    }
-                ],
-                "layout": {"title":f"네이버 {keyword} 키워드 검색 추이"},
-            }
 
-bar_figure_naver_top10_related= {
-                "data": [
-                    {
-                        "x": top_10_related_keywords['연관키워드'],
-                        "y": top_10_related_keywords['월간검색수_모바일'],
-                        "type": "bar", "name":"모바일"
-                    },
-                    {
-                        "x": top_10_related_keywords['연관키워드'],
-                        "y": top_10_related_keywords['월간검색수_PC'],
-                        "type": "bar", "name":"PC"
-                    }
-                ],
-                "layout": {"title":f"top10 연관 키워드 검색량"},
-            }
+###검색 추이 그래프
+graph_line_naver_search_trend = px.line(naver_trend, x = '날짜', 
+                                                     y = keyword, 
+                                                     title = '키워드 검색 추이')
 
-table_naver_item = dash_table.DataTable(
-    data = naver_item_info.to_dict('records'),
-    columns = [{'id':c, 'name':c} for c in naver_item_info.columns],
 
-    fixed_rows = {'headers':True},
 
-    style_table = {'maxHeight':'450px'},
-
-    style_header = {'backgroundColor':'rgb(20,100,20)',
-                    'fontWeight':'bold',
-                    'border':'4px solid white'},
-
-    style_data_conditional = [
-
-        {'if':{'row_index':'odd'},
-            'backgroundColor':'rgb(224,224,224)',
-            'fontSize':'15px'
-        },
-
-        {'if':{'row_index':'even'},
-            'backgroundColor':'rgb(255,255,255)',
-            'fontSize':'15px'
-        }
-    ],
-
-    style_cell = {
-        'textAlign':'center',
-        'border':'0.5px solid gray',
-        'whiteSpace':'normal'
-
-    }
-)
-
-naver_keyword = dash_table.DataTable(
-    data = keyword_search_volume.to_dict('records'),
-    columns = [{'id':c, 'name':c} for c in keyword_search_volume.columns]
-)
-
-table = dash_table.DataTable(
-    data = shopee_item_info.to_dict('records'),
-    columns = [{'id':c, 'name':c} for c in shopee_item_info.columns],
-
-    fixed_rows = {'headers':True},
-
-    style_table = {'maxHeight':'450px'},
-
-    style_header = {'backgroundColor':'rgb(20,100,20)',
-                    'fontWeight':'bold',
-                    'border':'4px solid white'},
-
-    style_data_conditional = [
-
-        {'if':{'row_index':'odd'},
-            'backgroundColor':'rgb(224,224,224)',
-            'fontSize':'15px'
-        },
-
-        {'if':{'row_index':'even'},
-            'backgroundColor':'rgb(255,255,255)',
-            'fontSize':'15px'
-        }
-    ],
-
-    style_cell = {
-        'textAlign':'center',
-        'border':'4px solid white',
-        'maxWidth':'50px',
-        'whiteSpace':'normal'
-
-    }
-)
+###top 연관 검색어
+graph_bar_naver_related_top = px.bar(top_10_related_keywords, x = '연관키워드',
+                                                              y = ['월간검색수_모바일','월간검색수_PC'],
+                                                              barmode='group',
+                                                              title = 'top 10 연관 키워드 검색량')
 
 naver_color = dict(zip(naver_item_info["브랜드"].unique(), px.colors.qualitative.G10))
 
@@ -189,14 +103,16 @@ graph_scatter_naver_item_price = px.scatter(naver_item_info,
                                             hover_name='상품명', 
                                             color='브랜드',
                                             color_discrete_map=naver_color, 
-                                            symbol='브랜드').update_traces(marker_size=10)
+                                            symbol='브랜드',
+                                            title='가격 분포').update_traces(marker_size=10)
 graph_scatter_naver_item_price.update_layout(showlegend=False)
 
 graph_pie_naver_brand_dist = px.pie(naver_item_info['브랜드'].value_counts(),
                                     values = naver_item_info['브랜드'].value_counts().values,
                                     names = naver_item_info['브랜드'].value_counts().index,
                                     color = naver_item_info['브랜드'].value_counts().index,
-                                    color_discrete_map=naver_color)
+                                    color_discrete_map=naver_color,
+                                    title = '브랜드 분포')
 
 ##----------------------------쇼피-----------------------------
 ###쇼피 최소, 평균, 최대 가격
@@ -205,24 +121,28 @@ shopee_item_info['브랜드'] = shopee_item_info['상품명'].apply(brand_from_t
 
 shopee_avg_price = round(shopee_item_info['가격(RM)'].mean())
 card_shopee_avg_price = [
-    dbc.CardHeader("쇼피 top50 평균 가격"),
-    dbc.CardBody([html.H3(f"{shopee_avg_price}")])  
+    dbc.CardHeader("top50 평균 가격"),
+    dbc.CardBody([html.H3(f"{shopee_avg_price} RM")])  
     ]
 
 shopee_min_price = round(shopee_item_info['가격(RM)'].min())
 card_shopee_min_price = [
-    dbc.CardHeader("쇼피 top50 최저 가격"),
-    dbc.CardBody([html.H3(f"{shopee_min_price}")])  
+    dbc.CardHeader("top50 최저 가격"),
+    dbc.CardBody([html.H3(f"{shopee_min_price} RM")])  
     ]
 
 shopee_max_price = round(shopee_item_info['가격(RM)'].max())
 card_shopee_max_price = [
-    dbc.CardHeader("쇼피 top50 최고 가격"),
-    dbc.CardBody([html.H3(f"{shopee_max_price}")])  
+    dbc.CardHeader("top50 최고 가격"),
+    dbc.CardBody([html.H3(f"{shopee_max_price} RM")])  
     ]
 ###쇼피 top50 기준 월 판매 시장 규모
 shopee_item_info['월판매액'] = shopee_item_info['가격(RM)'] * shopee_item_info['판매량(월 평균)']
-shopee_top50_monthly_market_share = shopee_item_info['월판매액'].sum()
+shopee_top50_monthly_market_size = int(shopee_item_info['월판매액'].sum())
+card_shopee_monthly_market_size = [
+    dbc.CardHeader("top50 상품 월 기준 시장규모"),
+    dbc.CardBody([html.H3(f"{shopee_top50_monthly_market_size} RM")])
+]
 
 ###쇼피 그래프 (가격대 스캐터, 브랜드 분포 파이)
 mask = shopee_item_info['브랜드'].map(shopee_item_info['브랜드'].value_counts()) == 1
@@ -237,39 +157,46 @@ graph_scatter_shopee_item_price = px.scatter(shopee_item_info,
                                             hover_name='상품명', 
                                             color='브랜드',
                                             color_discrete_map=shopee_color, 
-                                            symbol='브랜드').update_traces(marker_size=10)
+                                            symbol='브랜드',
+                                            title='가격 분포').update_traces(marker_size=10)
 graph_scatter_shopee_item_price.update_layout(showlegend=False)
 
 graph_pie_shopee_brand_dist = px.pie(shopee_item_info['브랜드'].value_counts(),
                                     values = shopee_item_info['브랜드'].value_counts().values,
                                     names = shopee_item_info['브랜드'].value_counts().index,
                                     color = shopee_item_info['브랜드'].value_counts().index,
-                                    color_discrete_map=shopee_color)
+                                    color_discrete_map=shopee_color,
+                                    title = '브랜드 분포')
 
 ##-----------------------구글 키워드------------------------------------
 google_top10 = google_top.sort_values(by='가중치',ascending=False).head(10)
 
 ###검색 추이 그래프
 graph_line_google_search_trend = px.line(naver_trend, x = '날짜', 
-                                                          y = 'Rice cooker', 
-                                                          title = '구글 키워드 검색 추이')
+                                                      y = 'Rice cooker', 
+                                                      title = '키워드 검색 추이')
+
+
 
 ###top 연관 검색어
 graph_bar_google_related_top = px.bar(google_top10, x = '연관 검색어',
-                                                  y = '가중치')
+                                                    y = '가중치',
+                                                    title = 'top 10 연관 키워드 검색량')
 
 google_keyword_related_words = google_top10['연관 검색어'].apply(strip_keyword).value_counts()
 
 graph_pie_google_keyword_dist = px.pie(google_keyword_related_words,
                                     values = google_keyword_related_words.values,
                                     names = google_keyword_related_words.index,
-                                    color = google_keyword_related_words.index)
+                                    color = google_keyword_related_words.index,
+                                    title = '연관 키워드 분포')
 graph_pie_google_keyword_dist.update_traces(hoverinfo='label+percent', textinfo='value')
 
 
 ###rising 연관 검색어
 graph_bar_google_related_rising = px.bar(google_rising, x = '연관 검색어',
-                                                  y = '가중치')
+                                                        y = '가중치',
+                                                        title = '연관 검색어 검색 빈도')
 
 graph_table_google_related_top = go.Figure(data=[go.Table(
     header=dict(values=list(google_top10.columns),
@@ -293,92 +220,104 @@ graph_table_google_related_rising = go.Figure(data=[go.Table(
 app = Dash(external_stylesheets = [ dbc.themes.MINTY],)
 
 app.layout = html.Div(id = 'parent_div', children = [
-    html.Div(id = 'card', children = [
-        dbc.Container([
+    html.Div(id = 'header',children = [html.H1(f'상품 키워드 검색/분석 결과')], 
+                                        style = {'textAlign':'center',
+                                                 'margin-top':'10px',
+                                                 'margin-bottom':'10px'}),
+    html.Hr(style = {'border':'1px'}),
+    html.Div(id = 'naver_keyword', children = [
+        html.H3('네이버 키워드 분석 결과 : ', style = {'margin-left':'65px',
+                                              'margin-top':'30px',
+                                              'margin-bottom':'30px'}),
+        html.Div(id = 'card', children = [
+            dbc.Container([
+                dbc.Row([
+                    dbc.Col(dbc.Card(card_keyword, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_search_volume, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_click_volume, color = 'info', outline = True))
+                        ])],
+                        style={'textAlign':'center',
+                            'whiteSpace':'normal'},
+                        fluid = False)
+        ]),
+        html.Br(),
+        html.Div(id = 'graph', children = [
+            dbc.Container([
             dbc.Row([
-                dbc.Col(dbc.Card(card_keyword, color = 'primary', outline = True)),
-                dbc.Col(dbc.Card(card_pc_search_volume, color = 'info', inverse = True)),
-                dbc.Col(dbc.Card(card_mobile_search_volume, color = 'info', inverse = True))
-                    ])],
-                    style={'textAlign':'center',
-                           'whiteSpace':'normal'},
-                    fluid = False)
-    ]),
-    html.Br(),
+            # 그래프		
+                # dbc.Col(dcc.Graph(figure = graph_figure_naver_search_trend)),
+                # dbc.Col(dcc.Graph(figure = bar_figure_naver_top10_related))
+                dbc.Col(dcc.Graph(figure = graph_line_naver_search_trend)),
+                dbc.Col(dcc.Graph(figure = graph_bar_naver_related_top))
+                ]),
+            ],style={'textAlign':'center',
+                    'whiteSpace':'normal',
+                    'maxWidth':'100%',
+                    'Display':'inline-block'}, fluid = True),
+        ])]),
+    html.Hr(style = {'border':'1px'}),
+    html.Div(id = 'naver_product', children = [
+        html.H3('네이버 상품 분석 결과 : ', style = {'margin-left':'65px',
+                                                'margin-bottom':'30px'}),
+        html.Div(id = 'naver_item_price_card', children = [
+            dbc.Container([
+                dbc.Row([
+                    dbc.Col(dbc.Card(card_naver_min_price, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_naver_avg_price, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_naver_max_price, color = 'info', outline = True))
+                    ]),
+                dbc.Row([
+                    dbc.Col(dcc.Graph(figure=graph_scatter_naver_item_price)),
+                    dbc.Col(dcc.Graph(figure=graph_pie_naver_brand_dist))
+                    ])
+                ],
+                        style={'textAlign':'center',
+                            'whiteSpace':'normal'},
+                        fluid = False)
+        ])]),
 
-    html.Div(id = 'graph', children = [
-        dbc.Container([
-        dbc.Row([
-        # 그래프		
-            dbc.Col(dcc.Graph(figure = graph_figure_naver_search_trend)),
-            dbc.Col(dcc.Graph(figure = bar_figure_naver_top10_related))
-            ]),
-        ],style={'textAlign':'center',
-                'whiteSpace':'normal',
-                'maxWidth':'100%',
-                'Display':'inline-block'}, fluid = True),
-    ]),
-    html.Div(id = 'naver_item_price_card', children = [
-        dbc.Container([
-            dbc.Row([
-                dbc.Col(dbc.Card(card_naver_min_price, color = 'primary', outline = True)),
-                dbc.Col(dbc.Card(card_naver_avg_price, color = 'info', inverse = True)),
-                dbc.Col(dbc.Card(card_naver_max_price, color = 'info', inverse = True))
-                ]),
-            dbc.Row([
-                dbc.Col(dcc.Graph(figure=graph_scatter_naver_item_price)),
-                dbc.Col(dcc.Graph(figure=graph_pie_naver_brand_dist))
-                ])
-            ],
-                    style={'textAlign':'center',
-                           'whiteSpace':'normal'},
-                    fluid = False)
-        ]),
     html.Br(),
-    html.Div(id = 'shopee_item_price_card', children = [
-        dbc.Container([
-            dbc.Row([
-                dbc.Col(dbc.Card(card_shopee_min_price, color = 'primary', outline = True)),
-                dbc.Col(dbc.Card(card_shopee_avg_price, color = 'info', inverse = True)),
-                dbc.Col(dbc.Card(card_shopee_max_price, color = 'info', inverse = True))
-                ]),
-            dbc.Row([
-                dbc.Col(dcc.Graph(figure=graph_scatter_shopee_item_price)),
-                dbc.Col(dcc.Graph(figure=graph_pie_shopee_brand_dist))
-                ])
-            ],
-                    style={'textAlign':'center',
-                           'whiteSpace':'normal'},
-                    fluid = False)
-        ]),
+    html.Hr(style = {'border':'1px'}),
+    html.Div(id = 'shopee_product', children = [
+        html.H3('쇼피 상품 분석 결과 : ', style = {'margin-left':'65px',
+                                                'margin-bottom':'30px'}),
+        html.Div(id = 'shopee_item_price_card', children = [
+            dbc.Container([
+                dbc.Row([
+                    dbc.Col(dbc.Card(card_shopee_min_price, color = 'primary', outline = True)),
+                    dbc.Col(dbc.Card(card_shopee_avg_price, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_shopee_max_price, color = 'info', outline = True)),
+                    dbc.Col(dbc.Card(card_shopee_monthly_market_size, color = 'info', outline = True))
+                    ]),
+                dbc.Row([
+                    dbc.Col(dcc.Graph(figure=graph_scatter_shopee_item_price)),
+                    dbc.Col(dcc.Graph(figure=graph_pie_shopee_brand_dist))
+                    ])
+                ],
+                        style={'textAlign':'center',
+                            'whiteSpace':'normal'},
+                        fluid = False)
+            ])]),
+        
     html.Br(),
+    html.Hr(style = {'border':'1px'}),
+    html.Div(id = 'google_keyword', children =[
+    html.H3('구글 키워드 분석 결과 : ', style = {'margin-left':'65px',
+                                              'margin-bottom':'30px'}),
     html.Div(id = 'google_search', children = [
         dbc.Container([
             dbc.Row([
-                dbc.Col(dcc.Graph(figure= graph_line_google_search_trend)),
                 dbc.Col(dcc.Graph(figure= graph_bar_google_related_top)),
+                dbc.Col(dcc.Graph(figure= graph_pie_google_keyword_dist))
                 ]),
             dbc.Row([
+                dbc.Col(dcc.Graph(figure= graph_line_google_search_trend)),
                 dbc.Col(dcc.Graph(figure= graph_table_google_related_rising)),
-                dbc.Col(dcc.Graph(figure= graph_pie_google_keyword_dist))
                 ]),
             ],
                     style={'textAlign':'center',
-                           'whiteSpace':'normal'},
-                    fluid = False)
-    ]),
-    html.Div(id = 'naver_item', children = [
-        dbc.Container([
-            dbc.Row([
-                dbc.Col(table_naver_item)
-            ])
-        ],style={'maxWidth':'50%'})
-    ]),
-    html.Br(),
-    html.Div(id = 'naver_keyword', children = [naver_keyword]),
-    html.Br(),
-    html.Div(id = 'shopee', children = [table]),
-    ])
+                           'whiteSpace':'normal'}, fluid = False)]),
+    ])], style = {'margin-top':'20px'})
 
 
 if __name__ == '__main__':
