@@ -119,7 +119,8 @@ def main(keyword,keyword_en):
         last_height = new_height
 
     shopee_info = shopee_get_item_info(driver)
-    
+    print('쇼피 데이터 요청 완료')
+
     #네이버
 
     def naver_get_url(keyword):
@@ -157,7 +158,7 @@ def main(keyword,keyword_en):
         time.sleep(0.5) 
 
     naver_info = naver_get_item_info(driver)
-
+    print('네이버 데이터 요청 완료')
 
     driver.quit()
 

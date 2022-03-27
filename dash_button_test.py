@@ -61,9 +61,11 @@ def update_output(n_clicks, value):
         #키워드 번역
         translator = googletrans.Translator()
         keyword_en = str(translator.translate(value, src='ko', dest='en').text)
+        print('키워드 번역 완료')
 
         #구글 검색 트렌드
         google = google_trends.GoogleTrend([keyword_en])
+        
         ## 떠오르는 연관 키워드
         google_rising = google.rising()
         ## 상위 연관 키워드
@@ -73,6 +75,7 @@ def update_output(n_clicks, value):
         ### 월별로 축소
         google_trend = google_trend.reset_index().groupby(google_trend.reset_index()['date'].dt.to_period('M')).mean()
         google_trend.reset_index(inplace=True)
+        print('구글 트렌드 요청 완료')
 
         ### 수치 정규화 (최대치 기준으로)
         df = google_trend[keyword_en]
@@ -85,13 +88,14 @@ def update_output(n_clicks, value):
 
         #쇼피 네이버 통합 상품 정보
         shopee_item_info, naver_item_info = integrated_crawler.main(value,keyword_en)
+        print('쇼피 네이버 상품 정보 요청 완료')
 
         #네이버 키워드 상품 검색량, 연관 키워드 검색량
         keyword_search_volume,top_10_related_keywords= naver_ads_api.main(value,API_KEY, SECRET_KEY, CUSTOMER_ID)
 
-
         #네이버 키워드 검색 추이
         naver_trend = naver_trends.main(value,NAVER_API_ID, NAVER_API_SECRET)
+        print('네이버 키워드 정보 요청 완료')
 
 
         #네이버 구글 검색 추이 통합
@@ -395,4 +399,4 @@ def update_output(n_clicks, value):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    server.run(debug=True)

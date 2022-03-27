@@ -1,4 +1,3 @@
-from crypt import methods
 from config_for_main import get_secret
 from crawlers import shopee_crawler, naver_trends,naver_shopping_crawler,naver_ads_api,google_trends
 from crawlers import integrated_crawler
