@@ -1,2 +1,2 @@
-web: gunicorn dash_button_test:server --preload
+web: gunicorn main_test:application --preload
 

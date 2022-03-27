@@ -78,9 +78,12 @@ def home():
     #키워드 번역
     translator = googletrans.Translator()
     keyword_en = str(translator.translate(keyword, src='ko', dest='en').text)
+    print('번역 완료')
 
     #구글 검색 트렌드
     google = google_trends.GoogleTrend([keyword_en])
+    print('구글 트렌드 데이터 요청 완료')
+
     ## 떠오르는 연관 키워드
     google_rising = google.rising()
     ## 상위 연관 키워드
@@ -102,10 +105,12 @@ def home():
 
     #쇼피 네이버 통합 상품 정보
     shopee_item_info, naver_item_info = integrated_crawler.main(keyword,keyword_en)
+    print('네이버, 쇼피 데이터 요청 완료')
+
 
     #네이버 키워드 상품 검색량, 연관 키워드 검색량
     keyword_search_volume,top_10_related_keywords= naver_ads_api.main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID)
-
+    print('네이버 키워드 광고 데이터 요청 완료')
 
     #네이버 키워드 검색 추이
     naver_trend = naver_trends.main(keyword,NAVER_API_ID, NAVER_API_SECRET)
