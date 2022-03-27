@@ -65,7 +65,7 @@ def main(keyword,keyword_en):
     start_time = time.time()
 
     options = FirefoxOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
 
     profile = webdriver.FirefoxProfile()
     profile.set_preference("reader.parse-on-load.enabled", False) # Disable reader, we won't need that.
