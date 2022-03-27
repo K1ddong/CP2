@@ -65,7 +65,12 @@ def main(keyword,keyword_en):
     start_time = time.time()
 
     options = FirefoxOptions()
+    options.log.level = 'trace'
+
     # options.add_argument("--headless")
+    options.add_argument('-no-sandbox')
+    options.add_argument('-disable-gpu')
+    options.add_argument('-remote-debugging-port=9224')
 
     profile = webdriver.FirefoxProfile()
     profile.set_preference("reader.parse-on-load.enabled", False) # Disable reader, we won't need that.
