@@ -1,1 +1,1 @@
-web: gunicorn dash_button_test:app --preload
+web: gunicorn dash_button_test:server --preload

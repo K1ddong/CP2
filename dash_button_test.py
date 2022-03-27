@@ -40,6 +40,7 @@ except:
 
 
 app = Dash(__name__, external_stylesheets = [dbc.themes.MINTY])
+server = app.server
 
 app.layout = html.Div([
     html.Div(dcc.Input(id='input-on-submit', type='text')),
