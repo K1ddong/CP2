@@ -94,8 +94,8 @@ def update_output(n_clicks, value):
         keyword_search_volume,top_10_related_keywords= naver_ads_api.main(value,API_KEY, SECRET_KEY, CUSTOMER_ID)
 
         #네이버 키워드 검색 추이
-        naver_trend = naver_trends.main(value,NAVER_API_ID, NAVER_API_SECRET)
         print('네이버 키워드 정보 요청 완료')
+        naver_trend = naver_trends.main(value,NAVER_API_ID, NAVER_API_SECRET)
 
 
         #네이버 구글 검색 추이 통합
