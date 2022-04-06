@@ -17,6 +17,7 @@ keyword_search_volume.csv
 top_10_related_keywords.csv
 naver_item_info.csv
 naver_trend.csv
+naver_shopping_test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

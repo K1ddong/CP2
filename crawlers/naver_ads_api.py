@@ -30,11 +30,10 @@ def main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID):
     uri = '/keywordstool'
     method = 'GET'
     BASE_URL = 'https://api.naver.com'
-    r = requests.get(BASE_URL + uri+'?hintKeywords={}&showDetail=1'.format(keyword),
+    r = requests.get(BASE_URL + uri+'?hintKeywords={}&showDetail=1'.format(keyword.replace(' ','')),
                     headers=get_header(method, uri, API_KEY, SECRET_KEY, CUSTOMER_ID))
-
     #전체 키워드 관련 자료
-    keyword_data = list(filter(lambda x:keyword in x['relKeyword'], r.json()['keywordList']))
+    keyword_data = list(filter(lambda x:keyword.split(' ')[0] in x['relKeyword'], r.json()['keywordList']))
     #필요한 것
     ##키워드 검색량
     # print('키워드 검색량', keyword_data[0])
@@ -73,5 +72,5 @@ if __name__ == '__main__':
     # API_KEY = get_secret("API_KEY")
     # SECRET_KEY = get_secret("SECRET_KEY")
     # CUSTOMER_ID = get_secret("CUSTOMER_ID")
-    keyword = '밥솥'
-    main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID)
+    keyword = '강아지 진드기 스프레이'
+    print(main(keyword,API_KEY, SECRET_KEY, CUSTOMER_ID))

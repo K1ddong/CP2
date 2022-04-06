@@ -1,2 +1,2 @@
-web: gunicorn main_test:application --preload
+web: gunicorn main_test:server --preload
 

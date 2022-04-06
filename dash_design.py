@@ -13,21 +13,11 @@ top_10_related_keywords = pd.read_csv('top_10_related_keywords.csv')
 naver_item_info = pd.read_csv('naver_item_info.csv')
 naver_trend = pd.read_csv('naver_trend.csv')
 
-google_rising,
-google_top,
-shopee_item_info,
-keyword_search_volume,
-top_10_related_keywords,
-naver_item_info,
-naver_trend
 
-# import dash, dash_html_components as html, dash_table
 import dash_bootstrap_components as dbc
 from dash import dcc, html, dash_table, Dash
 import plotly.graph_objects as go
-from dash.dependencies import Input, Output
 import plotly.express as px
-from plotly.subplots import make_subplots
 
 
 keyword = '밥솥'

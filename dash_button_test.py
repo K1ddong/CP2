@@ -43,10 +43,25 @@ app = Dash(__name__, external_stylesheets = [dbc.themes.MINTY])
 server = app.server
 
 app.layout = html.Div([
-    html.Div(dcc.Input(id='input-on-submit', type='text')),
-    html.Button('Submit', id='submit-val', n_clicks=0),
+    html.Div(id = 'header',children = [html.H1(f'상품 키워드 분석 서비스')], 
+                                            style = {'textAlign':'center',
+                                                    'margin-top':'10px',
+                                                    'margin-bottom':'10px'}),
+    html.Hr(style = {'border':'1px'}),
+
+    html.Div(children=[
+    html.Div(dcc.Input(id='input-on-submit', type='text', style={'width':'200px'})),
+    html.Button('Submit', id='submit-val', n_clicks=0, style={'margin-left':'10px',})],style={'verticalAlign':'middle'}),
     html.Div(id='container-button-basic',
-             children='Enter a value and press submit')
+             children='Enter a value and press submit'),
+
+#style={"display": "flex", "justifyContent": "center", 'margin-top':'100px'}
+
+    html.Div(children=[
+    html.H5('분석하고자 하는 키워드를 한글로 검색해주세요 (검색후 결과 출력까지 약 30초 소요)')],
+                                            style = {'textAlign':'center',
+                                                    'margin-top':'10px',
+                                                    'margin-bottom':'10px'}),
 ])
 
 
@@ -64,30 +79,30 @@ def update_output(n_clicks, value):
         print('키워드 번역 완료')
 
         #구글 검색 트렌드
-        google = google_trends.GoogleTrend([keyword_en])
+        # google = google_trends.GoogleTrend([keyword_en])
         
         ## 떠오르는 연관 키워드
-        google_rising = google.rising()
+        # google_rising = google.rising()
         ## 상위 연관 키워드
-        google_top = google.top()
+        # google_top = google.top()
         ## 키워드 검색 추이
-        google_trend = google.trends()
+        # google_trend = google.trends()
         ### 월별로 축소
-        google_trend = google_trend.reset_index().groupby(google_trend.reset_index()['date'].dt.to_period('M')).mean()
-        google_trend.reset_index(inplace=True)
-        print('구글 트렌드 요청 완료')
+        # google_trend = google_trend.reset_index().groupby(google_trend.reset_index()['date'].dt.to_period('M')).mean()
+        # google_trend.reset_index(inplace=True)
+        # print('구글 트렌드 요청 완료')
 
         ### 수치 정규화 (최대치 기준으로)
-        df = google_trend[keyword_en]
-        google_trend[keyword_en] = df/df.max() * 100 
+        # df = google_trend[keyword_en]
+        # google_trend[keyword_en] = df/df.max() * 100 
 
         # #쇼피 키워드 상품 정보
         # shopee_item_info = shopee_crawler.main(keyword_en)
         # #네이버 키워드 상품 정보
-        # naver_item_info = naver_shopping_crawler.main(value)
+        naver_item_info = naver_shopping_crawler.main(value)
 
         #쇼피 네이버 통합 상품 정보
-        shopee_item_info, naver_item_info = integrated_crawler.main(value,keyword_en)
+        # shopee_item_info, naver_item_info = integrated_crawler.main(value,keyword_en)
         print('쇼피 네이버 상품 정보 요청 완료')
 
         #네이버 키워드 상품 검색량, 연관 키워드 검색량
@@ -99,7 +114,7 @@ def update_output(n_clicks, value):
 
 
         #네이버 구글 검색 추이 통합
-        naver_trend[keyword_en] = google_trend[keyword_en]
+        # naver_trend[keyword_en] = google_trend[keyword_en]
 
         #-------------------------전처리-------------------------
 
@@ -184,7 +199,7 @@ def update_output(n_clicks, value):
 
         ##----------------------------쇼피-----------------------------
         ###쇼피 최소, 평균, 최대 가격
-
+        '''
         shopee_item_info['브랜드'] = shopee_item_info['상품명'].apply(brand_from_title)
 
         shopee_avg_price = round(shopee_item_info['가격(RM)'].mean())
@@ -235,8 +250,9 @@ def update_output(n_clicks, value):
                                             color = shopee_item_info['브랜드'].value_counts().index,
                                             color_discrete_map=shopee_color,
                                             title = '브랜드 분포')
-
+        '''
         ##-----------------------구글 키워드------------------------------------
+        '''
         google_top10 = google_top.sort_values(by='가중치',ascending=False).head(10)
 
         ###검색 추이 그래프
@@ -282,12 +298,12 @@ def update_output(n_clicks, value):
                     fill_color='lavender',
                     align='left'))
                         ])
-
+        '''
 
         #------------------------대시보드 레이아웃 ----------------------------------
-        keyword_dashboard = Dash(external_stylesheets = [ dbc.themes.MINTY],)
+        app = Dash(external_stylesheets = [ dbc.themes.MINTY],)
 
-        keyword_dashboard.layout = html.Div(id = 'parent_div', children = [
+        app.layout = html.Div(id = 'parent_div', children = [
         html.Div(id = 'header',children = [html.H1(f'상품 키워드 검색/분석 결과')], 
                                             style = {'textAlign':'center',
                                                     'margin-top':'10px',
@@ -346,6 +362,30 @@ def update_output(n_clicks, value):
 
         html.Br(),
         html.Hr(style = {'border':'1px'}),
+            
+        html.Br(),
+        html.Hr(style = {'border':'1px'}),
+        html.Div(id = 'google_keyword', children =[
+        html.H3('구글 키워드 분석 결과 : ', style = {'margin-left':'65px',
+                                                'margin-bottom':'30px'}),
+        
+        
+        ])], style = {'margin-top':'20px'})
+
+
+        return app.layout
+
+        # return 'The input value was "{}" and the button has been clicked {} times'.format(
+        #     value,
+        #     n_clicks
+        # )
+        # print(keyword_en)
+        # return value
+
+
+if __name__ == '__main__':
+    server.run(debug=True)
+    '''
         html.Div(id = 'shopee_product', children = [
             html.H3('쇼피 상품 분석 결과 : ', style = {'margin-left':'65px',
                                                     'margin-bottom':'30px'}),
@@ -366,37 +406,17 @@ def update_output(n_clicks, value):
                                 'whiteSpace':'normal'},
                             fluid = False)
                 ])]),
-            
-        html.Br(),
-        html.Hr(style = {'border':'1px'}),
-        html.Div(id = 'google_keyword', children =[
-        html.H3('구글 키워드 분석 결과 : ', style = {'margin-left':'65px',
-                                                'margin-bottom':'30px'}),
         html.Div(id = 'google_search', children = [
-            dbc.Container([
-                dbc.Row([
-                    dbc.Col(dcc.Graph(figure= graph_bar_google_related_top)),
-                    dbc.Col(dcc.Graph(figure= graph_pie_google_keyword_dist))
-                    ]),
-                dbc.Row([
-                    dbc.Col(dcc.Graph(figure= graph_line_google_search_trend)),
-                    dbc.Col(dcc.Graph(figure= graph_table_google_related_rising)),
-                    ]),
-                ],
-                        style={'textAlign':'center',
-                            'whiteSpace':'normal'}, fluid = False)]),
-        ])], style = {'margin-top':'20px'})
-
-
-        return keyword_dashboard.layout
-
-        # return 'The input value was "{}" and the button has been clicked {} times'.format(
-        #     value,
-        #     n_clicks
-        # )
-        # print(keyword_en)
-        # return value
-
-
-if __name__ == '__main__':
-    server.run(debug=True)
+    dbc.Container([
+        dbc.Row([
+            dbc.Col(dcc.Graph(figure= graph_bar_google_related_top)),
+            dbc.Col(dcc.Graph(figure= graph_pie_google_keyword_dist))
+            ]),
+        dbc.Row([
+            dbc.Col(dcc.Graph(figure= graph_line_google_search_trend)),
+            dbc.Col(dcc.Graph(figure= graph_table_google_related_rising)),
+            ]),
+        ],
+                style={'textAlign':'center',
+                    'whiteSpace':'normal'}, fluid = False)]),
+        '''
